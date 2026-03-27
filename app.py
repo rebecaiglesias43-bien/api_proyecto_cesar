@@ -2,7 +2,10 @@ from flask import Flask
 from flask_mysqldb import MySQL
 from routes import cargarRutas
 from config import Config
+from rutas.item_rutas import item_bp
 
+
+app.register_blueprint(item_bp)
 app = Flask(__name__)
 app.config.from_object(Config)
 
