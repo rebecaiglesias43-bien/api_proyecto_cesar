@@ -5,8 +5,7 @@ def cntlistado_detalles():
     try:
         from services.detalle_cita_service import DetalleCitaService
         service = DetalleCitaService(current_app.mysql)
-        detalles = service.listar_todos()
-        return jsonify(detalles)
+        return jsonify(service.listar_todos())
     except Exception as e:
         print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
@@ -15,10 +14,8 @@ def cntlistado_detalles_por_cita(id_cita):
     try:
         from services.detalle_cita_service import DetalleCitaService
         service = DetalleCitaService(current_app.mysql)
-        detalles = service.listar_por_cita(id_cita)
-        return jsonify(detalles)
+        return jsonify(service.listar_por_cita(id_cita))
     except Exception as e:
-        print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
 def cntcrear_detalle():
@@ -27,8 +24,8 @@ def cntcrear_detalle():
         from services.detalle_cita_service import DetalleCitaService
         service = DetalleCitaService(current_app.mysql)
         detalle = service.crear(
-            id_citaFK=data.get('id_citaFK'),
-            id_servicioFK=data.get('id_servicioFK'),
+            id_cita=data.get('id_cita'),
+            id_servicio=data.get('id_servicio'),
             precio_servicio=data.get('precio_servicio')
         )
         return jsonify(detalle), 201

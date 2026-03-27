@@ -1,6 +1,6 @@
 from flask import Blueprint
 from controllers.proveedor_controllers import (
-    cntlistado_proveedores, cntobtener_proveedor, 
+    cntlistado_proveedores, cntobtener_proveedor,
     cntcrear_proveedor, cntactualizar_proveedor, cnteliminar_proveedor
 )
 

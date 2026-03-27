@@ -1,14 +1,16 @@
 class FacturaModel:
-    def __init__(self, id_factura, id_citaFK, total, fecha_emision):
+    def __init__(self, id_factura, id_cita, fecha, total, estado):
         self.id_factura = id_factura
-        self.id_citaFK = id_citaFK
+        self.id_cita = id_cita
+        self.fecha = fecha
         self.total = total
-        self.fecha_emision = fecha_emision
+        self.estado = estado
     
     def to_dict(self):
         return {
             'id_factura': self.id_factura,
-            'id_citaFK': self.id_citaFK,
+            'id_cita': self.id_cita,
+            'fecha': str(self.fecha) if self.fecha else None,
             'total': float(self.total) if self.total else None,
-            'fecha_emision': str(self.fecha_emision) if self.fecha_emision else None
+            'estado': self.estado
         }

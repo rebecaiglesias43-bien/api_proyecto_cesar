@@ -1,7 +1,7 @@
 from flask import Blueprint
 from controllers.factura_controllers import (
-    cntlistado_facturas, cntobtener_factura, 
-    cntobtener_factura_por_cita, cntcrear_factura
+    cntlistado_facturas, cntobtener_factura,
+    cntobtener_factura_por_cita, cntcrear_factura, cntactualizar_estado_factura
 )
 
 factura_bp = Blueprint('factura', __name__)
@@ -21,3 +21,7 @@ def obtener_por_cita(id_cita):
 @factura_bp.route('/', methods=['POST'])
 def crear():
     return cntcrear_factura()
+
+@factura_bp.route('/<int:id_factura>/estado', methods=['PUT'])
+def actualizar_estado(id_factura):
+    return cntactualizar_estado_factura(id_factura)

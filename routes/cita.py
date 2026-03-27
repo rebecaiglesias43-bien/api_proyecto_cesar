@@ -1,6 +1,6 @@
 from flask import Blueprint
 from controllers.cita_controllers import (
-    cntlistado_citas, cntobtener_cita, cntcrear_cita, 
+    cntlistado_citas, cntobtener_cita, cntcrear_cita,
     cntactualizar_cita, cnteliminar_cita
 )
 

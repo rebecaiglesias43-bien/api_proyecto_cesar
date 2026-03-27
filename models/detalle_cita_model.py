@@ -1,14 +1,14 @@
 class DetalleCitaModel:
-    def __init__(self, id_detallecitaPK, id_citaFK, id_servicioFK, precio_servicio):
-        self.id_detallecitaPK = id_detallecitaPK
-        self.id_citaFK = id_citaFK
-        self.id_servicioFK = id_servicioFK
+    def __init__(self, id_detallecita, id_cita, id_servicio, precio_servicio):
+        self.id_detallecita = id_detallecita
+        self.id_cita = id_cita
+        self.id_servicio = id_servicio
         self.precio_servicio = precio_servicio
     
     def to_dict(self):
         return {
-            'id_detallecitaPK': self.id_detallecitaPK,
-            'id_citaFK': self.id_citaFK,
-            'id_servicioFK': self.id_servicioFK,
+            'id_detallecita': self.id_detallecita,
+            'id_cita': self.id_cita,
+            'id_servicio': self.id_servicio,
             'precio_servicio': float(self.precio_servicio) if self.precio_servicio else None
         }

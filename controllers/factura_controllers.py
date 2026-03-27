@@ -5,8 +5,7 @@ def cntlistado_facturas():
     try:
         from services.factura_service import FacturaService
         service = FacturaService(current_app.mysql)
-        facturas = service.listar_todas()
-        return jsonify(facturas)
+        return jsonify(service.listar_todas())
     except Exception as e:
         print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
@@ -20,7 +19,6 @@ def cntobtener_factura(id_factura):
             return jsonify(factura)
         return jsonify({'error': 'Factura no encontrada'}), 404
     except Exception as e:
-        print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
 def cntobtener_factura_por_cita(id_cita):
@@ -32,7 +30,6 @@ def cntobtener_factura_por_cita(id_cita):
             return jsonify(factura)
         return jsonify({'error': 'Factura no encontrada para esta cita'}), 404
     except Exception as e:
-        print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
 def cntcrear_factura():
@@ -41,10 +38,26 @@ def cntcrear_factura():
         from services.factura_service import FacturaService
         service = FacturaService(current_app.mysql)
         factura = service.crear(
-            id_citaFK=data.get('id_citaFK'),
-            total=data.get('total')
+            id_cita=data.get('id_cita'),
+            total=data.get('total'),
+            estado=data.get('estado', 'pendiente')
         )
         return jsonify(factura), 201
     except Exception as e:
         print(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+def cntactualizar_estado_factura(id_factura):
+    try:
+        data = request.get_json()
+        from services.factura_service import FacturaService
+        service = FacturaService(current_app.mysql)
+        factura = service.actualizar_estado(
+            id_factura,
+            estado=data.get('estado')
+        )
+        if factura:
+            return jsonify(factura)
+        return jsonify({'error': 'Factura no encontrada'}), 404
+    except Exception as e:
         return jsonify({'error': str(e)}), 500

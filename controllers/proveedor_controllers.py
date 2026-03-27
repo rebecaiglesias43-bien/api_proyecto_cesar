@@ -5,8 +5,7 @@ def cntlistado_proveedores():
     try:
         from services.proveedor_service import ProveedorService
         service = ProveedorService(current_app.mysql)
-        proveedores = service.listar_todos()
-        return jsonify(proveedores)
+        return jsonify(service.listar_todos())
     except Exception as e:
         print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
@@ -20,7 +19,6 @@ def cntobtener_proveedor(id_proveedor):
             return jsonify(proveedor)
         return jsonify({'error': 'Proveedor no encontrado'}), 404
     except Exception as e:
-        print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
 def cntcrear_proveedor():
@@ -29,9 +27,10 @@ def cntcrear_proveedor():
         from services.proveedor_service import ProveedorService
         service = ProveedorService(current_app.mysql)
         proveedor = service.crear(
-            nombre_contacto=data.get('nombre_contacto'),
-            empresa=data.get('empresa'),
-            telefono=data.get('telefono')
+            nombre_proveedor=data.get('nombre_proveedor'),
+            telefono=data.get('telefono'),
+            correo=data.get('correo'),
+            direccion=data.get('direccion')
         )
         return jsonify(proveedor), 201
     except Exception as e:
@@ -45,25 +44,23 @@ def cntactualizar_proveedor(id_proveedor):
         service = ProveedorService(current_app.mysql)
         proveedor = service.actualizar(
             id_proveedor,
-            nombre_contacto=data.get('nombre_contacto'),
-            empresa=data.get('empresa'),
-            telefono=data.get('telefono')
+            nombre_proveedor=data.get('nombre_proveedor'),
+            telefono=data.get('telefono'),
+            correo=data.get('correo'),
+            direccion=data.get('direccion')
         )
         if proveedor:
             return jsonify(proveedor)
         return jsonify({'error': 'Proveedor no encontrado'}), 404
     except Exception as e:
-        print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
 def cnteliminar_proveedor(id_proveedor):
     try:
         from services.proveedor_service import ProveedorService
         service = ProveedorService(current_app.mysql)
-        eliminado = service.eliminar(id_proveedor)
-        if eliminado:
+        if service.eliminar(id_proveedor):
             return jsonify({'mensaje': 'Proveedor eliminado correctamente'})
         return jsonify({'error': 'Proveedor no encontrado'}), 404
     except Exception as e:
-        print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
