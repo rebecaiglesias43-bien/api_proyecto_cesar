@@ -4,14 +4,13 @@ from routes import cargarRutas
 from config import Config
 from rutas.item_rutas import item_bp
 
-app = Flask(__name__)  # 👈 PRIMERO se crea
+app = Flask(__name__)
 
 app.config.from_object(Config)
 
 mysql = MySQL(app)
 app.mysql = mysql
 
-# 👇 luego registras rutas
 app.register_blueprint(item_bp)
 
 cargarRutas(app)
