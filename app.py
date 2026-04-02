@@ -1,7 +1,7 @@
 # app.py
 from flask import Flask
 from flask_mysqldb import MySQL
-from routes import cargarRuta
+from routes import cargarRutas  # Cambiado: cargarRuta → cargarRutas
 from config import Config
 
 app = Flask(__name__)
@@ -9,5 +9,5 @@ app.config.from_object(Config)
 
 mysql = MySQL(app)
 app.mysql = mysql
-cargarRuta(app)
+cargarRutas(app)  # Cambiado: cargarRuta → cargarRutas
 app.run(debug=True, port=4000, host='0.0.0.0')
