@@ -6,7 +6,7 @@ class ProveedorService:
     
     def listar_todos(self):
         cursor = self.mysql.connection.cursor()
-        cursor.execute("SELECT id_proveedor, nombre_proveedor, telefono, correo, direccion FROM proveedor")
+        cursor.execute("SELECT id_proveedor, nombre_proveedor, telefono, correo, direccion FROM proveedores")
         proveedores = cursor.fetchall()
         cursor.close()
         resultado = []
@@ -16,7 +16,7 @@ class ProveedorService:
     
     def obtener_por_id(self, id_proveedor):
         cursor = self.mysql.connection.cursor()
-        cursor.execute("SELECT id_proveedor, nombre_proveedor, telefono, correo, direccion FROM proveedor WHERE id_proveedor = %s", (id_proveedor,))
+        cursor.execute("SELECT id_proveedor, nombre_proveedor, telefono, correo, direccion FROM proveedores WHERE id_proveedor = %s", (id_proveedor,))
         proveedor = cursor.fetchone()
         cursor.close()
         if proveedor:
@@ -26,7 +26,7 @@ class ProveedorService:
     def crear(self, nombre_proveedor, telefono, correo, direccion):
         cursor = self.mysql.connection.cursor()
         cursor.execute(
-            "INSERT INTO proveedor (nombre_proveedor, telefono, correo, direccion) VALUES (%s, %s, %s, %s)",
+            "INSERT INTO proveedores (nombre_proveedor, telefono, correo, direccion) VALUES (%s, %s, %s, %s)",
             (nombre_proveedor, telefono, correo, direccion)
         )
         self.mysql.connection.commit()
@@ -47,7 +47,7 @@ class ProveedorService:
         nueva_direccion = direccion if direccion is not None else proveedor_actual['direccion']
         
         cursor.execute(
-            "UPDATE proveedor SET nombre_proveedor=%s, telefono=%s, correo=%s, direccion=%s WHERE id_proveedor=%s",
+            "UPDATE proveedores SET nombre_proveedor=%s, telefono=%s, correo=%s, direccion=%s WHERE id_proveedor=%s",
             (nuevo_nombre, nuevo_telefono, nuevo_correo, nueva_direccion, id_proveedor)
         )
         self.mysql.connection.commit()
@@ -56,7 +56,7 @@ class ProveedorService:
     
     def eliminar(self, id_proveedor):
         cursor = self.mysql.connection.cursor()
-        cursor.execute("DELETE FROM proveedor WHERE id_proveedor = %s", (id_proveedor,))
+        cursor.execute("DELETE FROM proveedores WHERE id_proveedor = %s", (id_proveedor,))
         self.mysql.connection.commit()
         afectadas = cursor.rowcount
         cursor.close()

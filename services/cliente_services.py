@@ -3,7 +3,7 @@ from models.cliente_model import Cliente
 
 def listado_cliente():
     c = current_app.mysql.connection.cursor()
-    sql = "SELECT * FROM cliente"
+    sql = "SELECT * FROM clientes"
     c.execute(sql)
     datos = c.fetchall()
     return datos
@@ -19,4 +19,3 @@ def eliminar():
 
 def buscarxcodigo():
     return
-

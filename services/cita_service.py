@@ -6,7 +6,7 @@ class CitaService:
     
     def listar_todas(self):
         cursor = self.mysql.connection.cursor()
-        cursor.execute("SELECT id_cita, id_cliente, id_empleado, fecha, hora, estado FROM cita")
+        cursor.execute("SELECT id_cita, id_cliente, id_empleado, fecha, hora, estado FROM citas")
         citas = cursor.fetchall()
         cursor.close()
         resultado = []
@@ -16,7 +16,7 @@ class CitaService:
     
     def obtener_por_id(self, id_cita):
         cursor = self.mysql.connection.cursor()
-        cursor.execute("SELECT id_cita, id_cliente, id_empleado, fecha, hora, estado FROM cita WHERE id_cita = %s", (id_cita,))
+        cursor.execute("SELECT id_cita, id_cliente, id_empleado, fecha, hora, estado FROM citas WHERE id_cita = %s", (id_cita,))
         cita = cursor.fetchone()
         cursor.close()
         if cita:
@@ -26,7 +26,7 @@ class CitaService:
     def crear(self, id_cliente, id_empleado, fecha, hora, estado):
         cursor = self.mysql.connection.cursor()
         cursor.execute(
-            "INSERT INTO cita (id_cliente, id_empleado, fecha, hora, estado) VALUES (%s, %s, %s, %s, %s)",
+            "INSERT INTO citas (id_cliente, id_empleado, fecha, hora, estado) VALUES (%s, %s, %s, %s, %s)",
             (id_cliente, id_empleado, fecha, hora, estado)
         )
         self.mysql.connection.commit()
@@ -48,7 +48,7 @@ class CitaService:
         nuevo_estado = estado if estado is not None else cita_actual['estado']
         
         cursor.execute(
-            "UPDATE cita SET id_cliente=%s, id_empleado=%s, fecha=%s, hora=%s, estado=%s WHERE id_cita=%s",
+            "UPDATE citas SET id_cliente=%s, id_empleado=%s, fecha=%s, hora=%s, estado=%s WHERE id_cita=%s",
             (nuevo_cliente, nuevo_empleado, nueva_fecha, nueva_hora, nuevo_estado, id_cita)
         )
         self.mysql.connection.commit()
@@ -57,7 +57,7 @@ class CitaService:
     
     def eliminar(self, id_cita):
         cursor = self.mysql.connection.cursor()
-        cursor.execute("DELETE FROM cita WHERE id_cita = %s", (id_cita,))
+        cursor.execute("DELETE FROM citas WHERE id_cita = %s", (id_cita,))
         self.mysql.connection.commit()
         afectadas = cursor.rowcount
         cursor.close()

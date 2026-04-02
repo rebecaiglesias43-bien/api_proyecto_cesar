@@ -7,7 +7,7 @@ class PagoService:
     
     def listar_todos(self):
         cursor = self.mysql.connection.cursor()
-        cursor.execute("SELECT id_pago, id_factura, metodo_pago, fecha_pago, monto FROM pago")
+        cursor.execute("SELECT id_pago, id_factura, metodo_pago, fecha_pago, monto FROM pagos")
         pagos = cursor.fetchall()
         cursor.close()
         resultado = []
@@ -17,7 +17,7 @@ class PagoService:
     
     def obtener_por_id(self, id_pago):
         cursor = self.mysql.connection.cursor()
-        cursor.execute("SELECT id_pago, id_factura, metodo_pago, fecha_pago, monto FROM pago WHERE id_pago = %s", (id_pago,))
+        cursor.execute("SELECT id_pago, id_factura, metodo_pago, fecha_pago, monto FROM pagos WHERE id_pago = %s", (id_pago,))
         p = cursor.fetchone()
         cursor.close()
         if p:
@@ -26,7 +26,7 @@ class PagoService:
         
     def listar_por_factura(self, id_factura):
         cursor = self.mysql.connection.cursor()
-        cursor.execute("SELECT id_pago, id_factura, metodo_pago, fecha_pago, monto FROM pago WHERE id_factura = %s", (id_factura,))
+        cursor.execute("SELECT id_pago, id_factura, metodo_pago, fecha_pago, monto FROM pagos WHERE id_factura = %s", (id_factura,))
         pagos = cursor.fetchall()
         cursor.close()
         resultado = []
@@ -38,7 +38,7 @@ class PagoService:
         fecha_actual = date.today()
         cursor = self.mysql.connection.cursor()
         cursor.execute(
-            "INSERT INTO pago (id_factura, metodo_pago, fecha_pago, monto) VALUES (%s, %s, %s, %s)",
+            "INSERT INTO pagos (id_factura, metodo_pago, fecha_pago, monto) VALUES (%s, %s, %s, %s)",
             (id_factura, metodo_pago, fecha_actual, monto)
         )
         self.mysql.connection.commit()

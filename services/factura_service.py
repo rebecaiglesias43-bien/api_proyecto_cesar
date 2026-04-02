@@ -7,7 +7,7 @@ class FacturaService:
     
     def listar_todas(self):
         cursor = self.mysql.connection.cursor()
-        cursor.execute("SELECT id_factura, id_cita, fecha, total, estado FROM factura")
+        cursor.execute("SELECT id_factura, id_cita, fecha, total, estado FROM facturas")
         facturas = cursor.fetchall()
         cursor.close()
         resultado = []
@@ -17,7 +17,7 @@ class FacturaService:
     
     def obtener_por_id(self, id_factura):
         cursor = self.mysql.connection.cursor()
-        cursor.execute("SELECT id_factura, id_cita, fecha, total, estado FROM factura WHERE id_factura = %s", (id_factura,))
+        cursor.execute("SELECT id_factura, id_cita, fecha, total, estado FROM facturas WHERE id_factura = %s", (id_factura,))
         factura = cursor.fetchone()
         cursor.close()
         if factura:
@@ -26,7 +26,7 @@ class FacturaService:
     
     def obtener_por_cita(self, id_cita):
         cursor = self.mysql.connection.cursor()
-        cursor.execute("SELECT id_factura, id_cita, fecha, total, estado FROM factura WHERE id_cita = %s", (id_cita,))
+        cursor.execute("SELECT id_factura, id_cita, fecha, total, estado FROM facturas WHERE id_cita = %s", (id_cita,))
         factura = cursor.fetchone()
         cursor.close()
         if factura:
@@ -37,7 +37,7 @@ class FacturaService:
         fecha_actual = date.today()
         cursor = self.mysql.connection.cursor()
         cursor.execute(
-            "INSERT INTO factura (id_cita, fecha, total, estado) VALUES (%s, %s, %s, %s)",
+            "INSERT INTO facturas (id_cita, fecha, total, estado) VALUES (%s, %s, %s, %s)",
             (id_cita, fecha_actual, total, estado)
         )
         self.mysql.connection.commit()
@@ -48,7 +48,7 @@ class FacturaService:
     def actualizar_estado(self, id_factura, estado):
         cursor = self.mysql.connection.cursor()
         cursor.execute(
-            "UPDATE factura SET estado = %s WHERE id_factura = %s",
+            "UPDATE facturas SET estado = %s WHERE id_factura = %s",
             (estado, id_factura)
         )
         self.mysql.connection.commit()
