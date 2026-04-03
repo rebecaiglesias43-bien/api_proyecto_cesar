@@ -1,30 +1,25 @@
-from flask import jsonify, current_app
-import traceback
+from flask import request, jsonify, current_app
+from services.cliente_services import ClienteService
 
-def cntlistado():
-    try:
-        print("=== Iniciando cntlistado ===")
-        mysql = current_app.mysql
-        cursor = mysql.connection.cursor()
-        cursor.execute("SELECT * FROM cliente")
-        clientes = cursor.fetchall()
-        print(f"Clientes encontrados: {len(clientes)}")
-        
-        resultado = []
-        for cliente in clientes:
-            resultado.append({
-                'id_cliente': cliente[0],
-                'nombre': cliente[1],
-                'apellido': cliente[2],
-                'telefono': cliente[3],
-                'direccion': cliente[4],
-                'id_usuarioFK': cliente[5]
-            })
-        
-        print(f"Resultado: {resultado}")
-        return jsonify(resultado)
-        
-    except Exception as e:
-        print("=== ERROR ===")
-        print(traceback.format_exc())
-        return jsonify({'error': str(e)}), 500
+def cntlistado_clientes():
+    service = ClienteService(current_app.mysql)
+    return jsonify(service.listar_todos())
+
+def cntobtener_cliente(id_cliente):
+    service = ClienteService(current_app.mysql)
+    cliente = service.obtener_por_id(id_cliente)
+    if cliente:
+        return jsonify(cliente)
+    return jsonify({'error': 'Cliente no encontrado'}), 404
+
+def cntcrear_cliente():
+    data = request.get_json()
+    service = ClienteService(current_app.mysql)
+    cliente = service.crear(
+        id_usuarioFK=data.get('id_usuarioFK'),
+        nombre=data.get('nombre'),
+        apellido=data.get('apellido'),
+        telefono=data.get('telefono'),
+        direccion=data.get('direccion')
+    )
+    return jsonify(cliente), 201

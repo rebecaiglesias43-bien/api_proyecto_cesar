@@ -3,7 +3,7 @@ import traceback
 
 def cntlistado_servicios():
     try:
-        from services.servicio_service import ServicioService
+        from services.servicio_services import ServicioService
         service = ServicioService(current_app.mysql)
         return jsonify(service.listar_todos())
     except Exception as e:
@@ -12,7 +12,7 @@ def cntlistado_servicios():
 
 def cntobtener_servicio(id_servicio):
     try:
-        from services.servicio_service import ServicioService
+        from services.servicio_services import ServicioService
         service = ServicioService(current_app.mysql)
         servicio = service.obtener_por_id(id_servicio)
         if servicio:
@@ -24,7 +24,7 @@ def cntobtener_servicio(id_servicio):
 def cntcrear_servicio():
     try:
         data = request.get_json()
-        from services.servicio_service import ServicioService
+        from services.servicio_services import ServicioService
         service = ServicioService(current_app.mysql)
         servicio = service.crear(
             nombre_servicio=data.get('nombre_servicio'),
@@ -40,7 +40,7 @@ def cntcrear_servicio():
 def cntactualizar_servicio(id_servicio):
     try:
         data = request.get_json()
-        from services.servicio_service import ServicioService
+        from services.servicio_services import ServicioService
         service = ServicioService(current_app.mysql)
         servicio = service.actualizar(
             id_servicio,
@@ -57,7 +57,7 @@ def cntactualizar_servicio(id_servicio):
 
 def cnteliminar_servicio(id_servicio):
     try:
-        from services.servicio_service import ServicioService
+        from services.servicio_services import ServicioService
         service = ServicioService(current_app.mysql)
         if service.eliminar(id_servicio):
             return jsonify({'mensaje': 'Servicio eliminado correctamente'})
