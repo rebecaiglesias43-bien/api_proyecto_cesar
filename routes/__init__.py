@@ -1,18 +1,18 @@
-from .cliente import cliente_bp
-from .cita import cita_bp
-from .detalle_cita import detalle_cita_bp
-from .detalle_factura import detalle_factura_bp
-from .factura import factura_bp
-from .proveedor import proveedor_bp
-from .servicio import servicio_bp
-from .pago import pago_bp
-from .empleado import empleado_bp
-from .horario import horario_bp
-from .usuario import usuario_bp
-from .producto import producto_bp
-from .servicio_producto import servicio_producto_bp
-from .proveedor_producto import proveedor_producto_bp
-from .inventario_movimiento import inventario_movimiento_bp
+from .clientes import cliente_bp
+from .citas import cita_bp
+from .detalles_citas import detalle_cita_bp
+from .detalles_facturas import detalle_factura_bp
+from .facturas import factura_bp
+from .proveedores import proveedor_bp
+from .servicios import servicio_bp
+from .pagos import pago_bp
+from .empleados import empleado_bp
+from .horarios import horario_bp
+from .usuarios import usuario_bp
+from .productos import producto_bp
+from .servicios_productos import servicio_producto_bp
+from .proveedores_productos import proveedor_producto_bp
+from .inventarios_movimientos import inventario_movimiento_bp
 
 def cargarRutas(app):
     app.register_blueprint(cliente_bp, url_prefix='/clientes')
