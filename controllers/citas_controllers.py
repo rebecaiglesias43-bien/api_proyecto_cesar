@@ -23,3 +23,25 @@ def cntcrear_cita():
         estado=data.get('estado')
     )
     return jsonify(cita), 201
+
+def cntactualizar_cita(id_cita):
+    data = request.get_json()
+    service = CitaService(current_app.mysql)
+    cita = service.actualizar(
+        id_cita=id_cita,
+        id_cliente=data.get('id_cliente'),
+        id_empleado=data.get('id_empleado'),
+        fecha=data.get('fecha'),
+        hora=data.get('hora'),
+        estado=data.get('estado')
+    )
+    if cita:
+        return jsonify(cita)
+    return jsonify({'error': 'Cita no encontrada'}), 404
+
+def cnteliminar_cita(id_cita):
+    service = CitaService(current_app.mysql)
+    eliminado = service.eliminar(id_cita)
+    if eliminado:
+        return jsonify({'mensaje': 'Cita eliminada correctamente'})
+    return jsonify({'error': 'Cita no encontrada'}), 404
