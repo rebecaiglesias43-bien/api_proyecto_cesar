@@ -48,3 +48,26 @@ class CitaModel:
         id_generado = cursor.lastrowid
         cursor.close()
         return CitaModel.obtener_por_id(id_generado)
+
+    @staticmethod
+    def actualizar(id_cita, id_cliente, id_empleado, fecha, hora, estado):
+        cursor = current_app.mysql.connection.cursor()
+        cursor.execute(
+            "UPDATE citas SET cit_cliente_id = %s, cit_empleado_id = %s, cit_fecha = %s, cit_hora = %s, cit_estado = %s WHERE cit_id = %s",
+            (id_cliente, id_empleado, fecha, hora, estado, id_cita)
+        )
+        current_app.mysql.connection.commit()
+        filas = cursor.rowcount
+        cursor.close()
+        if filas == 0:
+            return None
+        return CitaModel.obtener_por_id(id_cita)
+
+    @staticmethod
+    def eliminar(id_cita):
+        cursor = current_app.mysql.connection.cursor()
+        cursor.execute("DELETE FROM citas WHERE cit_id = %s", (id_cita,))
+        current_app.mysql.connection.commit()
+        filas = cursor.rowcount
+        cursor.close()
+        return filas > 0
