@@ -5,6 +5,19 @@ def cntlistado_servicios_productos():
     service = ServicioProductoService(current_app.mysql)
     return jsonify(service.listar_todos())
 
+def cntcrear_servicio_producto():
+    data = request.get_json()
+    id_servicio = data.get('id_servicio')
+    id_producto = data.get('id_producto')
+    cantidad = data.get('cantidad')
+
+    if not all([id_servicio, id_producto, cantidad]):
+        return jsonify({'error': 'Faltan campos requeridos'}), 400
+
+    service = ServicioProductoService(current_app.mysql)
+    relacion = service.crear(id_servicio, id_producto, cantidad)
+    return jsonify(relacion), 201
+
 def cntactualizar_servicio_producto(id_relacion):
     data = request.get_json()
     service = ServicioProductoService(current_app.mysql)

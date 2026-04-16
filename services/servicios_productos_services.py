@@ -10,6 +10,9 @@ class ServicioProductoService:
     def obtener_por_id(self, id_relacion):
         return ServicioProductoModel.obtener_por_id(id_relacion)
 
+    def crear(self, id_servicio, id_producto, cantidad):
+        return ServicioProductoModel.crear(id_servicio, id_producto, cantidad)
+
     def actualizar(self, id_relacion, id_servicio, id_producto, cantidad):
         return ServicioProductoModel.actualizar(id_relacion, id_servicio, id_producto, cantidad)
 

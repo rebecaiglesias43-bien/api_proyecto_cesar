@@ -37,6 +37,18 @@ class ServicioProductoModel:
         return None
 
     @staticmethod
+    def crear(id_servicio, id_producto, cantidad):
+        cursor = current_app.mysql.connection.cursor()
+        cursor.execute(
+            "INSERT INTO servicios_productos (sep_servicio_id, sep_producto_id, sep_cantidad) VALUES (%s, %s, %s)",
+            (id_servicio, id_producto, cantidad)
+        )
+        current_app.mysql.connection.commit()
+        id_generado = cursor.lastrowid
+        cursor.close()
+        return ServicioProductoModel.obtener_por_id(id_generado)
+
+    @staticmethod
     def actualizar(id_relacion, id_servicio, id_producto, cantidad):
         cursor = current_app.mysql.connection.cursor()
         cursor.execute(
