@@ -14,7 +14,7 @@ def listado():
 def listado_por_cita(id_cita):
     return cntlistado_detalles_por_cita(id_cita)
 
-@detalle_cita_bp.route('/', methods=['POST'])
+@detalle_cita_bp.route('/crear', methods=['POST'])
 def crear():
     return cntcrear_detalle()
 
