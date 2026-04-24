@@ -39,7 +39,21 @@ class ProveedorModel:
         return ProveedorModel.obtener_por_id(mysql, id_generado)
 
     @staticmethod
+    def tiene_productos_asociados(mysql, id_proveedor):
+        cursor = mysql.connection.cursor()
+        cursor.execute(
+            "SELECT 1 FROM proveedores_productos WHERE ppr_proveedor_id = %s LIMIT 1",
+            (id_proveedor,)
+        )
+        existe = cursor.fetchone() is not None
+        cursor.close()
+        return existe
+
+    @staticmethod
     def actualizar(mysql, id_proveedor, nombre, telefono, email, direccion):
+        if not ProveedorModel.obtener_por_id(mysql, id_proveedor):
+            return None
+
         cursor = mysql.connection.cursor()
         cursor.execute(
             "UPDATE proveedores "
@@ -48,10 +62,7 @@ class ProveedorModel:
             (nombre, telefono, email, direccion, id_proveedor)
         )
         mysql.connection.commit()
-        filas = cursor.rowcount
         cursor.close()
-        if filas == 0:
-            return None
         return ProveedorModel.obtener_por_id(mysql, id_proveedor)
 
     @staticmethod

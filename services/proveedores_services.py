@@ -25,4 +25,8 @@ class ProveedorService:
         )
 
     def eliminar(self, id_proveedor):
+        if not ProveedorModel.obtener_por_id(self.mysql, id_proveedor):
+            return False
+        if ProveedorModel.tiene_productos_asociados(self.mysql, id_proveedor):
+            raise ValueError('No se puede eliminar el proveedor porque tiene productos asociados')
         return ProveedorModel.eliminar(self.mysql, id_proveedor)
