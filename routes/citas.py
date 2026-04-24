@@ -14,7 +14,7 @@ def listado():
 def obtener(id_cita):
     return cntobtener_cita(id_cita)
 
-@cita_bp.route('/', methods=['POST'])
+@cita_bp.route('/crear', methods=['POST'])
 def crear():
     return cntcrear_cita()
 
