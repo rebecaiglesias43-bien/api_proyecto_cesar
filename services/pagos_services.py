@@ -17,3 +17,6 @@ class PagoService:
     def crear(self, id_factura, metodo, monto):
         fecha_actual = date.today()
         return PagoModel.crear(id_factura, metodo, fecha_actual, monto)
+    
+    def actualizar(self, id_pago, **datos):
+        return PagoModel.actualizar(id_pago, **datos)
