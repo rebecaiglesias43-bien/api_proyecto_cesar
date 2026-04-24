@@ -12,3 +12,6 @@ class DetalleFacturaService:
     
     def crear(self, id_factura, id_servicio, subtotal):
         return DetalleFacturaModel.crear(id_factura, id_servicio, subtotal)
+    
+    def actualizar(self, id_detalle, **datos):
+        return DetalleFacturaModel.actualizar(id_detalle, **datos)
