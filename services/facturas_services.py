@@ -20,3 +20,6 @@ class FacturaService:
     
     def actualizar_estado(self, id_factura, estado):
         return FacturaModel.actualizar_estado(id_factura, estado)
+    
+    def actualizar(self, id_factura, **datos):
+        return FacturaModel.actualizar(id_factura, **datos)
