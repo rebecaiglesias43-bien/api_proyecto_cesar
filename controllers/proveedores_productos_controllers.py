@@ -55,8 +55,15 @@ def _validar_payload(data):
 
 
 def cntlistado_proveedores_productos():
+    try:
+        page = int(request.args.get('page', 1))
+        per_page = int(request.args.get('per_page', 10))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Los parametros "page" y "per_page" deben ser numeros enteros'}), 400
+    if page <= 0 or per_page <= 0:
+        return jsonify({'error': 'Los parametros "page" y "per_page" deben ser mayores que cero'}), 400
     service = ProveedorProductoService(current_app.mysql)
-    return jsonify(service.listar_todos())
+    return jsonify(service.listar_todos(page, per_page))
 
 
 def cntobtener_proveedor_producto(id_relacion):

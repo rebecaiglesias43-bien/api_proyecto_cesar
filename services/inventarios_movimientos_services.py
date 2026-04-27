@@ -5,8 +5,8 @@ class InventarioMovimientoService:
     def __init__(self, mysql):
         self.mysql = mysql
 
-    def listar_todos(self):
-        return InventarioMovimientoModel.listar_todos(self.mysql)
+    def listar_todos(self, page, per_page):
+        return InventarioMovimientoModel.listar_todos(self.mysql, page, per_page)
 
     def obtener_por_id(self, id_movimiento):
         return InventarioMovimientoModel.obtener_por_id(self.mysql, id_movimiento)

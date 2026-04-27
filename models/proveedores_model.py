@@ -1,14 +1,26 @@
 class ProveedorModel:
     @staticmethod
-    def listar_todos(mysql):
+    def listar_todos(mysql, page, per_page):
         cursor = mysql.connection.cursor()
+        cursor.execute("SELECT COUNT(*) FROM proveedores")
+        total = cursor.fetchone()[0]
+        offset = (page - 1) * per_page
         cursor.execute(
-            "SELECT prv_id, prv_nombre, prv_telefono, prv_email, prv_direccion FROM proveedores"
+            "SELECT prv_id, prv_nombre, prv_telefono, prv_email, prv_direccion "
+            "FROM proveedores ORDER BY prv_id LIMIT %s OFFSET %s",
+            (per_page, offset)
         )
         columns = [col[0] for col in cursor.description]
         data = [dict(zip(columns, row)) for row in cursor.fetchall()]
         cursor.close()
-        return data
+        total_pages = (total + per_page - 1) // per_page if total else 0
+        return {
+            'data': data,
+            'total': total,
+            'page': page,
+            'per_page': per_page,
+            'total_pages': total_pages
+        }
 
     @staticmethod
     def obtener_por_id(mysql, id_proveedor):

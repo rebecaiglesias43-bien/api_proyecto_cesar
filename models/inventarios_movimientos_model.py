@@ -7,16 +7,27 @@ class InventarioMovimientoModel:
         return item
 
     @staticmethod
-    def listar_todos(mysql):
+    def listar_todos(mysql, page, per_page):
         cursor = mysql.connection.cursor()
+        cursor.execute("SELECT COUNT(*) FROM inventario_movimientos")
+        total = cursor.fetchone()[0]
+        offset = (page - 1) * per_page
         cursor.execute(
             "SELECT inm_id, inm_producto_id, inm_tipo, inm_cantidad, inm_fecha, inm_motivo "
-            "FROM inventario_movimientos"
+            "FROM inventario_movimientos ORDER BY inm_id LIMIT %s OFFSET %s",
+            (per_page, offset)
         )
         columns = [col[0] for col in cursor.description]
         data = [InventarioMovimientoModel._serialize_row(columns, row) for row in cursor.fetchall()]
         cursor.close()
-        return data
+        total_pages = (total + per_page - 1) // per_page if total else 0
+        return {
+            'data': data,
+            'total': total,
+            'page': page,
+            'per_page': per_page,
+            'total_pages': total_pages
+        }
 
     @staticmethod
     def obtener_por_id(mysql, id_movimiento):
