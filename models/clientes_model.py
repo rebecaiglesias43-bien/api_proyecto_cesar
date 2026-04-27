@@ -1,3 +1,4 @@
+import math
 from flask import current_app
 
 class Cliente:
@@ -18,17 +19,35 @@ class Cliente:
             'telefono': self.telefono,
             'direccion': self.direccion
         }
-    
-    @staticmethod
-    def listar_todos():
+        
+     @staticmethod
+    def listar_todos(page=1, limit=10):
+        offset = (page - 1) * limit
         cursor = current_app.mysql.connection.cursor()
-        cursor.execute("SELECT cli_id, cli_usuario_id, cli_nombre, cli_apellido, cli_telefono, cli_direccion FROM clientes")
+        
+        # Obtener total de registros de CLIENTES
+        cursor.execute("SELECT COUNT(*) FROM clientes")
+        total_items = cursor.fetchone()[0]
+        
+        # Obtener registros paginados de CLIENTES
+        cursor.execute("SELECT cli_id, cli_usuario_id, cli_nombre, cli_apellido, cli_telefono, cli_direccion FROM clientes LIMIT %s OFFSET %s", (limit, offset))
         clientes = cursor.fetchall()
         cursor.close()
+        
         resultado = []
         for c in clientes:
+            # Aquí usamos Cliente en lugar de UsuarioModel
             resultado.append(Cliente(c[0], c[1], c[2], c[3], c[4], c[5]).to_dict())
-        return resultado
+            
+        return {
+            "data": resultado,
+            "pagination": {
+                "page": page, 
+                "limit": limit, 
+                "total_items": total_items,
+                "total_pages": math.ceil(total_items / limit) if limit > 0 else 1
+            }
+        }
     
     @staticmethod
     def obtener_por_id(id_cliente):
