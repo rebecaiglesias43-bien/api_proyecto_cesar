@@ -51,3 +51,36 @@ class DetalleCitaModel:
         if d:
             return DetalleCitaModel(d[0], d[1], d[2], d[3]).to_dict()
         return None
+
+    @staticmethod
+    def obtener_por_id(id_detalle):
+        cursor = current_app.mysql.connection.cursor()
+        cursor.execute("SELECT dci_id, dci_cita_id, dci_servicio_id, dci_precio FROM detalle_citas WHERE dci_id = %s", (id_detalle,))
+        d = cursor.fetchone()
+        cursor.close()
+        if d:
+            return DetalleCitaModel(d[0], d[1], d[2], d[3]).to_dict()
+        return None
+
+    @staticmethod
+    def actualizar(id_detalle, id_cita, id_servicio, precio):
+        cursor = current_app.mysql.connection.cursor()
+        cursor.execute(
+            "UPDATE detalle_citas SET dci_cita_id = %s, dci_servicio_id = %s, dci_precio = %s WHERE dci_id = %s",
+            (id_cita, id_servicio, precio, id_detalle)
+        )
+        current_app.mysql.connection.commit()
+        filas = cursor.rowcount
+        cursor.close()
+        if filas == 0:
+            return None
+        return DetalleCitaModel.obtener_por_id(id_detalle)
+
+    @staticmethod
+    def eliminar(id_detalle):
+        cursor = current_app.mysql.connection.cursor()
+        cursor.execute("DELETE FROM detalle_citas WHERE dci_id = %s", (id_detalle,))
+        current_app.mysql.connection.commit()
+        filas = cursor.rowcount
+        cursor.close()
+        return filas > 0

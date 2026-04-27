@@ -1,6 +1,7 @@
-flask 
+Flask
 flask-cors
 flask-mysqldb
 python-dotenv
 
+# pip install - r requirements.txt
 # pip install - r requirements.txt

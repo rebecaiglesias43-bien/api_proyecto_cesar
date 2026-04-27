@@ -33,3 +33,9 @@ class CitaService:
         id_generado = cursor.lastrowid
         cursor.close()
         return self.obtener_por_id(id_generado)
+
+    def actualizar(self, id_cita, id_cliente, id_empleado, fecha, hora, estado):
+        return CitaModel.actualizar(id_cita, id_cliente, id_empleado, fecha, hora, estado)
+
+    def eliminar(self, id_cita):
+        return CitaModel.eliminar(id_cita)
