@@ -39,6 +39,17 @@ class PagoModel:
         return None
     
     @staticmethod
+    def listar_por_factura(id_factura):
+        cursor = current_app.mysql.connection.cursor()
+        cursor.execute("SELECT pag_id, pag_factura_id, pag_metodo, pag_fecha, pag_monto FROM pagos WHERE pag_factura_id = %s", (id_factura,))
+        pagos = cursor.fetchall()
+        cursor.close()
+        resultado = []
+        for p in pagos:
+            resultado.append(PagoModel(p[0], p[1], p[2], p[3], p[4]).to_dict())
+        return resultado
+    
+    @staticmethod
     def crear(id_factura, metodo, fecha, monto):
         cursor = current_app.mysql.connection.cursor()
         cursor.execute("INSERT INTO pagos (pag_factura_id, pag_metodo, pag_fecha, pag_monto) VALUES (%s, %s, %s, %s)", (id_factura, metodo, fecha, monto))

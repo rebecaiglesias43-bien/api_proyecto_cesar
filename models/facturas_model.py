@@ -39,6 +39,24 @@ class FacturaModel:
         return None
     
     @staticmethod
+    def obtener_por_cita(id_cita):
+        cursor = current_app.mysql.connection.cursor()
+        cursor.execute("SELECT fac_id, fac_cita_id, fac_fecha, fac_total, fac_estado FROM facturas WHERE fac_cita_id = %s", (id_cita,))
+        f = cursor.fetchone()
+        cursor.close()
+        if f:
+            return FacturaModel(f[0], f[1], f[2], f[3], f[4]).to_dict()
+        return None
+    
+    @staticmethod
+    def actualizar_estado(id_factura, estado):
+        cursor = current_app.mysql.connection.cursor()
+        cursor.execute("UPDATE facturas SET fac_estado = %s WHERE fac_id = %s", (estado, id_factura))
+        current_app.mysql.connection.commit()
+        cursor.close()
+        return FacturaModel.obtener_por_id(id_factura)
+    
+    @staticmethod
     def crear(id_cita, fecha, total, estado):
         cursor = current_app.mysql.connection.cursor()
         cursor.execute("INSERT INTO facturas (fac_cita_id, fac_fecha, fac_total, fac_estado) VALUES (%s, %s, %s, %s)", (id_cita, fecha, total, estado))
