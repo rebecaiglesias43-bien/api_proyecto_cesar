@@ -5,8 +5,8 @@ class ProveedorService:
     def __init__(self, mysql):
         self.mysql = mysql
 
-    def listar_todos(self):
-        return ProveedorModel.listar_todos(self.mysql)
+    def listar_todos(self, page, per_page):
+        return ProveedorModel.listar_todos(self.mysql, page, per_page)
 
     def obtener_por_id(self, id_proveedor):
         return ProveedorModel.obtener_por_id(self.mysql, id_proveedor)

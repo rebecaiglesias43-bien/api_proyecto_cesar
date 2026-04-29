@@ -1,5 +1,3 @@
-from flask import current_app
-
 class UsuarioModel:
     def __init__(self, id_usuario=None, username=None, password=None, email=None, rol=None, estado=None):
         self.id_usuario = id_usuario
@@ -19,8 +17,8 @@ class UsuarioModel:
         }
     
     @staticmethod
-    def listar_todos():
-        cursor = current_app.mysql.connection.cursor()
+    def listar_todos(mysql):
+        cursor = mysql.connection.cursor()
         cursor.execute("SELECT usu_id, usu_username, usu_password, usu_email, usu_rol, usu_estado FROM usuarios")
         usuarios = cursor.fetchall()
         cursor.close()
@@ -30,8 +28,8 @@ class UsuarioModel:
         return resultado
     
     @staticmethod
-    def obtener_por_id(id_usuario):
-        cursor = current_app.mysql.connection.cursor()
+    def obtener_por_id(mysql, id_usuario):
+        cursor = mysql.connection.cursor()
         cursor.execute("SELECT usu_id, usu_username, usu_password, usu_email, usu_rol, usu_estado FROM usuarios WHERE usu_id = %s", (id_usuario,))
         u = cursor.fetchone()
         cursor.close()
@@ -40,10 +38,24 @@ class UsuarioModel:
         return None
     
     @staticmethod
-    def crear(username, password, email, rol, estado):
-        cursor = current_app.mysql.connection.cursor()
+    def crear(mysql, username, password, email, rol, estado):
+        cursor = mysql.connection.cursor()
         cursor.execute("INSERT INTO usuarios (usu_username, usu_password, usu_email, usu_rol, usu_estado) VALUES (%s, %s, %s, %s, %s)", (username, password, email, rol, estado))
-        current_app.mysql.connection.commit()
+        mysql.connection.commit()
         id_generado = cursor.lastrowid
         cursor.close()
-        return UsuarioModel.obtener_por_id(id_generado)
+        return UsuarioModel.obtener_por_id(mysql, id_generado)
+
+    @staticmethod
+    def autenticar(mysql, username, password):
+        cursor = mysql.connection.cursor()
+        cursor.execute(
+            "SELECT usu_id, usu_username, usu_password, usu_email, usu_rol, usu_estado "
+            "FROM usuarios WHERE usu_username = %s AND usu_password = %s AND usu_estado = %s",
+            (username, password, 'activo')
+        )
+        u = cursor.fetchone()
+        cursor.close()
+        if u:
+            return UsuarioModel(u[0], u[1], u[2], u[3], u[4], u[5]).to_dict()
+        return None
