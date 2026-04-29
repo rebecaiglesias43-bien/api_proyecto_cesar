@@ -15,16 +15,36 @@ class DetalleCitaModel:
             'precio': float(self.precio) if self.precio else None
         }
     
-    @staticmethod
-    def listar_todos():
-        cursor = current_app.mysql.connection.cursor()
-        cursor.execute("SELECT dci_id, dci_cita_id, dci_servicio_id, dci_precio FROM detalle_citas")
-        detalles = cursor.fetchall()
-        cursor.close()
-        resultado = []
-        for d in detalles:
-            resultado.append(DetalleCitaModel(d[0], d[1], d[2], d[3]).to_dict())
-        return resultado
+@staticmethod
+def listar_todos(mysql, page=1, per_page=10):
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT COUNT(*) FROM detalle_citas")
+    total = cursor.fetchone()[0]
+    
+    offset = (page - 1) * per_page
+    cursor.execute("""
+        SELECT dci_id, dci_cita_id, dci_servicio_id, dci_precio 
+        FROM detalle_citas 
+        ORDER BY dci_id 
+        LIMIT %s OFFSET %s
+    """, (per_page, offset))
+    
+    detalles = cursor.fetchall()
+    cursor.close()
+    
+    resultado = []
+    for d in detalles:
+        resultado.append(DetalleCitaModel(d[0], d[1], d[2], d[3]).to_dict())
+    
+    total_pages = (total + per_page - 1) // per_page if total else 0
+    
+    return {
+        'data': resultado,
+        'total': total,
+        'page': page,
+        'per_page': per_page,
+        'total_pages': total_pages
+    }
     
     @staticmethod
     def listar_por_cita(id_cita):

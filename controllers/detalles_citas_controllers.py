@@ -1,9 +1,24 @@
 from flask import request, jsonify, current_app
 from services.detalles_citas_services import DetalleCitaService
 
+from flask import request, jsonify, current_app
+from flask_jwt_extended import jwt_required
+from services.detalles_citas_services import DetalleCitaService
+
 def cntlistado_detalles():
+    try:
+        page = int(request.args.get('page', 1))
+        per_page = int(request.args.get('per_page', 10))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Los parámetros "page" y "per_page" deben ser números enteros'}), 400
+    
+    if page <= 0 or per_page <= 0:
+        return jsonify({'error': 'Los parámetros "page" y "per_page" deben ser mayores que cero'}), 400
+    
     service = DetalleCitaService(current_app.mysql)
-    return jsonify(service.listar_todos())
+    return jsonify(service.listar_todos(page, per_page))
+
+
 
 def cntlistado_detalles_por_cita(id_cita):
     service = DetalleCitaService(current_app.mysql)

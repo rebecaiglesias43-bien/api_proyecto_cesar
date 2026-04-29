@@ -5,10 +5,13 @@ class UsuarioService:
         self.mysql = mysql
     
     def listar_todos(self):
-        return UsuarioModel.listar_todos()
+        return UsuarioModel.listar_todos(self.mysql)
     
     def obtener_por_id(self, id_usuario):
-        return UsuarioModel.obtener_por_id(id_usuario)
+        return UsuarioModel.obtener_por_id(self.mysql, id_usuario)
     
     def crear(self, username, password, email, rol, estado):
-        return UsuarioModel.crear(username, password, email, rol, estado)
+        return UsuarioModel.crear(self.mysql, username, password, email, rol, estado)
+
+    def autenticar(self, username, password):
+        return UsuarioModel.autenticar(self.mysql, username, password)
