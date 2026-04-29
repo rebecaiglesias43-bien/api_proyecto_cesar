@@ -23,10 +23,22 @@ def validar_datos_empleado(data):
     
     cur.close()
     return True, None
-def cntlistado_empleados():
-    service = EmpleadoService(current_app.mysql)
-    return jsonify(service.listar_todos())
 
+@jwt_required()
+def cntlistado_empleados():
+    try:
+        page = int(request.args.get('page', 1))
+        per_page = int(request.args.get('per_page', 10))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Los parámetros "page" y "per_page" deben ser números enteros'}), 400
+
+    if page <= 0 or per_page <= 0:
+        return jsonify({'error': 'Los parámetros "page" y "per_page" deben ser mayores que cero'}), 400
+
+    service = EmpleadoService(current_app.mysql)
+    return jsonify(service.listar_todos(page, per_page))
+
+@jwt_required()
 def cntobtener_empleado(id_empleado):
     service = EmpleadoService(current_app.mysql)
     empleado = service.obtener_por_id(id_empleado)
@@ -34,6 +46,7 @@ def cntobtener_empleado(id_empleado):
         return jsonify(empleado)
     return jsonify({'error': 'Empleado no encontrado'}), 404
 
+@jwt_required()
 def cntcrear_empleado():
     data = request.get_json()
     es_valido, mensaje = validar_datos_empleado(data)
