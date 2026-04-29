@@ -4,10 +4,10 @@ class DetalleCitaService:
     def __init__(self, mysql):
         self.mysql = mysql
     
-    def listar_todos(self):
-        return DetalleCitaModel.listar_todos()
-    
-    def listar_por_cita(self, id_cita):
+    def listar_todos(self, page=1, per_page=10):
+     return DetalleCitaModel.listar_todos(self.mysql, page, per_page)
+
+    def listar_por_cita(self, id_cita, page=1, per_page=10):
         return DetalleCitaModel.listar_por_cita(id_cita)
 
     def obtener_por_id(self, id_detalle):

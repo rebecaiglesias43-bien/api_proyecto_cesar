@@ -1,1 +1,1341 @@
-
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API ESTETICA",
+    "description": "API REST para gestión de citas, servicios, clientes, empleados y facturas de un centro de estética.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4000"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Token JWT obtenido desde POST /usuarios/login"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Autenticación de usuarios del sistema"
+    },
+    {
+      "name": "Usuarios",
+      "description": "Gestión de usuarios del sistema"
+    },
+    {
+      "name": "Citas",
+      "description": "Gestión de citas"
+    },
+    {
+      "name": "Detalle Citas",
+      "description": "Gestión de servicios por cita"
+    },
+    {
+      "name": "Servicios",
+      "description": "Gestión de servicios ofrecidos"
+    },
+    {
+      "name": "Clientes",
+      "description": "Gestión de clientes"
+    },
+    {
+      "name": "Empleados",
+      "description": "Gestión de empleados"
+    },
+    {
+      "name": "Facturas",
+      "description": "Gestión de facturación"
+    },
+    {
+      "name": "Pagos",
+      "description": "Gestión de pagos"
+    },
+    {
+      "name": "Productos",
+      "description": "Gestión de productos"
+    },
+    {
+      "name": "Proveedores",
+      "description": "Gestión de proveedores"
+    },
+    {
+      "name": "Horarios",
+      "description": "Gestión de horarios de empleados"
+    }
+  ],
+  "paths": {
+    "/usuarios/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Iniciar sesión",
+        "description": "Verifica las credenciales del usuario y retorna un token JWT. El token debe incluirse en el header Authorization de las rutas protegidas.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["username", "password"],
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "admin"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "123456"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login exitoso. Retorna el token JWT.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "access_token": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    },
+                    "usuario": {
+                      "type": "object",
+                      "properties": {
+                        "id_usuario": { "type": "integer", "example": 1 },
+                        "username": { "type": "string", "example": "admin" },
+                        "email": { "type": "string", "example": "admin@test.com" },
+                        "rol": { "type": "string", "example": "admin" },
+                        "estado": { "type": "string", "example": "activo" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Faltan credenciales (username o password vacíos)"
+          },
+          "401": {
+            "description": "Credenciales inválidas"
+          }
+        }
+      }
+    },
+    "/usuarios/": {
+      "get": {
+        "tags": ["Usuarios"],
+        "summary": "Listar usuarios",
+        "description": "Retorna todos los usuarios registrados en el sistema.",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de usuarios obtenida correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id_usuario": { "type": "integer", "example": 1 },
+                      "username": { "type": "string", "example": "admin" },
+                      "email": { "type": "string", "example": "admin@test.com" },
+                      "rol": { "type": "string", "example": "admin" },
+                      "estado": { "type": "string", "example": "activo" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Token inválido o no enviado" }
+        }
+      },
+      "post": {
+        "tags": ["Usuarios"],
+        "summary": "Registrar un nuevo usuario",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["username", "password", "email", "rol"],
+                "properties": {
+                  "username": { "type": "string", "example": "jperez" },
+                  "password": { "type": "string", "example": "clave123" },
+                  "email": { "type": "string", "example": "jperez@test.com" },
+                  "rol": { "type": "string", "example": "cliente", "description": "Valores: admin, cliente, empleado" },
+                  "estado": { "type": "string", "example": "activo", "default": "activo" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Usuario registrado correctamente" },
+          "400": { "description": "Campos faltantes, vacíos o username duplicado" },
+          "401": { "description": "Token inválido o no enviado" }
+        }
+      }
+    },
+    "/usuarios/{id}": {
+      "get": {
+        "tags": ["Usuarios"],
+        "summary": "Obtener un usuario por ID",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 1 }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Usuario encontrado" },
+          "401": { "description": "Token inválido o no enviado" },
+          "404": { "description": "Usuario no encontrado" }
+        }
+      }
+    },
+    "/citas/": {
+      "get": {
+        "tags": ["Citas"],
+        "summary": "Listar citas (paginado)",
+        "description": "Retorna el listado de citas con paginación. Incluye total, página actual y total de páginas.",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 },
+            "description": "Número de página"
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 10 },
+            "description": "Elementos por página"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de citas obtenida correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id_cita": { "type": "integer", "example": 1 },
+                          "id_cliente": { "type": "integer", "example": 1 },
+                          "id_empleado": { "type": "integer", "example": 1 },
+                          "fecha": { "type": "string", "example": "2026-04-01" },
+                          "hora": { "type": "string", "example": "10:00:00" },
+                          "estado": { "type": "string", "example": "pendiente" }
+                        }
+                      }
+                    },
+                    "total": { "type": "integer", "example": 1 },
+                    "page": { "type": "integer", "example": 1 },
+                    "per_page": { "type": "integer", "example": 10 },
+                    "total_pages": { "type": "integer", "example": 1 }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Token inválido o no enviado" }
+        }
+      }
+    },
+    "/citas/crear": {
+      "post": {
+        "tags": ["Citas"],
+        "summary": "Registrar una nueva cita",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["id_cliente", "id_empleado", "fecha", "hora"],
+                "properties": {
+                  "id_cliente": { "type": "integer", "example": 1 },
+                  "id_empleado": { "type": "integer", "example": 1 },
+                  "fecha": { "type": "string", "example": "2026-05-20" },
+                  "hora": { "type": "string", "example": "14:30:00" },
+                  "estado": { "type": "string", "example": "pendiente", "default": "pendiente" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Cita registrada correctamente" },
+          "400": { "description": "Campos faltantes o valores inválidos" },
+          "401": { "description": "Token inválido o no enviado" }
+        }
+      }
+    },
+    "/citas/{id}": {
+      "get": {
+        "tags": ["Citas"],
+        "summary": "Obtener una cita por ID",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 1 }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Cita encontrada" },
+          "401": { "description": "Token inválido o no enviado" },
+          "404": { "description": "Cita no encontrada" }
+        }
+      },
+      "put": {
+        "tags": ["Citas"],
+        "summary": "Actualizar una cita",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 1 }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id_cliente": { "type": "integer", "example": 1 },
+                  "id_empleado": { "type": "integer", "example": 2 },
+                  "fecha": { "type": "string", "example": "2026-05-21" },
+                  "hora": { "type": "string", "example": "15:00:00" },
+                  "estado": { "type": "string", "example": "confirmada" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Cita actualizada correctamente" },
+          "401": { "description": "Token inválido o no enviado" },
+          "404": { "description": "Cita no encontrada" }
+        }
+      },
+      "delete": {
+        "tags": ["Citas"],
+        "summary": "Eliminar una cita",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 1 }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Cita eliminada correctamente" },
+          "401": { "description": "Token inválido o no enviado" },
+          "404": { "description": "Cita no encontrada" }
+        }
+      }
+    },
+    "/detalle_citas/": {
+      "get": {
+        "tags": ["Detalle Citas"],
+        "summary": "Listar detalles de citas (paginado)",
+        "description": "Retorna el listado de servicios por cita con paginación.",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 10 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de detalles obtenida correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id_detalle": { "type": "integer", "example": 1 },
+                          "id_cita": { "type": "integer", "example": 1 },
+                          "id_servicio": { "type": "integer", "example": 1 },
+                          "precio": { "type": "number", "example": 20000.00 }
+                        }
+                      }
+                    },
+                    "total": { "type": "integer", "example": 1 },
+                    "page": { "type": "integer", "example": 1 },
+                    "per_page": { "type": "integer", "example": 10 },
+                    "total_pages": { "type": "integer", "example": 1 }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Token inválido o no enviado" }
+        }
+      }
+    },
+    "/detalle_citas/crear": {
+      "post": {
+        "tags": ["Detalle Citas"],
+        "summary": "Registrar un nuevo detalle de cita",
+        "description": "Registra un servicio asociado a una cita.",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["id_cita", "id_servicio", "precio"],
+                "properties": {
+                  "id_cita": { "type": "integer", "example": 1 },
+                  "id_servicio": { "type": "integer", "example": 1 },
+                  "precio": { "type": "number", "example": 20000.00 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Detalle registrado correctamente" },
+          "400": { "description": "Campos faltantes" },
+          "401": { "description": "Token inválido o no enviado" }
+        }
+      }
+    },
+    "/detalle_citas/cita/{id_cita}": {
+      "get": {
+        "tags": ["Detalle Citas"],
+        "summary": "Obtener detalles por cita",
+        "description": "Retorna todos los servicios asociados a una cita específica.",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id_cita",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 1 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de detalles de la cita",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id_detalle": { "type": "integer", "example": 1 },
+                      "id_cita": { "type": "integer", "example": 1 },
+                      "id_servicio": { "type": "integer", "example": 1 },
+                      "precio": { "type": "number", "example": 20000.00 }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Token inválido o no enviado" }
+        }
+      }
+    },
+    "/detalle_citas/{id}": {
+      "put": {
+        "tags": ["Detalle Citas"],
+        "summary": "Actualizar un detalle de cita",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 1 }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id_cita": { "type": "integer", "example": 1 },
+                  "id_servicio": { "type": "integer", "example": 2 },
+                  "precio": { "type": "number", "example": 25000.00 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Detalle actualizado correctamente" },
+          "401": { "description": "Token inválido o no enviado" },
+          "404": { "description": "Detalle no encontrado" }
+        }
+      },
+      "delete": {
+        "tags": ["Detalle Citas"],
+        "summary": "Eliminar un detalle de cita",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 1 }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Detalle eliminado correctamente" },
+          "401": { "description": "Token inválido o no enviado" },
+          "404": { "description": "Detalle no encontrado" }
+        }
+      }
+    },
+    "/servicios/": {
+      "get": {
+        "tags": ["Servicios"],
+        "summary": "Listar servicios",
+        "description": "Retorna todos los servicios ofrecidos por la estética.",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de servicios obtenida correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id_servicio": { "type": "integer", "example": 1 },
+                      "nombre": { "type": "string", "example": "Corte de cabello" },
+                      "descripcion": { "type": "string", "example": "Corte básico" },
+                      "precio": { "type": "number", "example": 20000.00 },
+                      "duracion": { "type": "integer", "example": 30 }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Token inválido o no enviado" }
+        }
+      },
+      "post": {
+        "tags": ["Servicios"],
+        "summary": "Registrar un nuevo servicio",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["nombre_servicio", "precio"],
+                "properties": {
+                  "nombre_servicio": { "type": "string", "example": "Manicure" },
+                  "descripcion": { "type": "string", "example": "Servicio de uñas" },
+                  "precio": { "type": "number", "example": 15000.00 },
+                  "duracion_aprox": { "type": "integer", "example": 45 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Servicio registrado correctamente" },
+          "401": { "description": "Token inválido o no enviado" }
+        }
+      }
+    },
+    "/servicios/{id}": {
+      "get": {
+        "tags": ["Servicios"],
+        "summary": "Obtener un servicio por ID",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 1 }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Servicio encontrado" },
+          "401": { "description": "Token inválido o no enviado" },
+          "404": { "description": "Servicio no encontrado" }
+        }
+      },
+      "put": {
+        "tags": ["Servicios"],
+        "summary": "Actualizar un servicio",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 1 }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nombre_servicio": { "type": "string", "example": "Manicure Premium" },
+                  "descripcion": { "type": "string", "example": "Servicio completo de uñas" },
+                  "precio": { "type": "number", "example": 25000.00 },
+                  "duracion_aprox": { "type": "integer", "example": 60 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Servicio actualizado correctamente" },
+          "401": { "description": "Token inválido o no enviado" },
+          "404": { "description": "Servicio no encontrado" }
+        }
+      },
+      "delete": {
+        "tags": ["Servicios"],
+        "summary": "Eliminar un servicio",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 1 }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Servicio eliminado correctamente" },
+          "401": { "description": "Token inválido o no enviado" },
+          "404": { "description": "Servicio no encontrado" }
+        }
+      }
+    },
+    "/clientes/": {
+      "get": {
+        "tags": ["Clientes"],
+        "summary": "Listar clientes",
+        "description": "Retorna todos los clientes registrados en el sistema.",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de clientes obtenida correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id_cliente": { "type": "integer", "example": 1 },
+                      "id_usuario": { "type": "integer", "example": 2 },
+                      "nombre": { "type": "string", "example": "Juan" },
+                      "apellido": { "type": "string", "example": "Perez" },
+                      "telefono": { "type": "string", "example": "3009876543" },
+                      "direccion": { "type": "string", "example": "Calle 123" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Token inválido o no enviado" }
+        }
+      },
+      "post": {
+        "tags": ["Clientes"],
+        "summary": "Registrar un nuevo cliente",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["nombre", "apellido"],
+                "properties": {
+                  "id_usuarioFK": { "type": "integer", "example": 2 },
+                  "nombre": { "type": "string", "example": "Maria" },
+                  "apellido": { "type": "string", "example": "Gomez" },
+                  "telefono": { "type": "string", "example": "3001234567" },
+                  "direccion": { "type": "string", "example": "Carrera 45 #20-10" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Cliente registrado correctamente" },
+          "401": { "description": "Token inválido o no enviado" }
+        }
+      }
+    },
+    "/clientes/{id}": {
+      "get": {
+        "tags": ["Clientes"],
+        "summary": "Obtener un cliente por ID",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 1 }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Cliente encontrado" },
+          "401": { "description": "Token inválido o no enviado" },
+          "404": { "description": "Cliente no encontrado" }
+        }
+      }
+    },
+    "/empleados/": {
+      "get": {
+        "tags": ["Empleados"],
+        "summary": "Listar empleados",
+        "description": "Retorna todos los empleados de la estética.",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de empleados obtenida correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id_empleado": { "type": "integer", "example": 1 },
+                      "id_usuario": { "type": "integer", "example": 1 },
+                      "nombre": { "type": "string", "example": "Ana" },
+                      "apellido": { "type": "string", "example": "Lopez" },
+                      "telefono": { "type": "string", "example": "3001234567" },
+                      "cargo": { "type": "string", "example": "Estilista" },
+                      "especialidad": { "type": "string", "example": "Corte y peinado" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Token inválido o no enviado" }
+        }
+      },
+      "post": {
+        "tags": ["Empleados"],
+        "summary": "Registrar un nuevo empleado",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["nombre", "apellido", "cargo"],
+                "properties": {
+                  "id_usuario": { "type": "integer", "example": 3 },
+                  "nombre": { "type": "string", "example": "Carlos" },
+                  "apellido": { "type": "string", "example": "Ruiz" },
+                  "telefono": { "type": "string", "example": "3008887777" },
+                  "cargo": { "type": "string", "example": "Masajista" },
+                  "especialidad": { "type": "string", "example": "Masajes relajantes" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Empleado registrado correctamente" },
+          "401": { "description": "Token inválido o no enviado" }
+        }
+      }
+    },
+    "/empleados/{id}": {
+      "get": {
+        "tags": ["Empleados"],
+        "summary": "Obtener un empleado por ID",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 1 }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Empleado encontrado" },
+          "401": { "description": "Token inválido o no enviado" },
+          "404": { "description": "Empleado no encontrado" }
+        }
+      }
+    },
+    "/facturas/": {
+      "get": {
+        "tags": ["Facturas"],
+        "summary": "Listar facturas",
+        "description": "Retorna todas las facturas generadas.",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de facturas obtenida correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id_factura": { "type": "integer", "example": 1 },
+                      "id_cita": { "type": "integer", "example": 1 },
+                      "fecha": { "type": "string", "example": "2026-04-01" },
+                      "total": { "type": "number", "example": 20000.00 },
+                      "estado": { "type": "string", "example": "pagado" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Token inválido o no enviado" }
+        }
+      },
+      "post": {
+        "tags": ["Facturas"],
+        "summary": "Registrar una nueva factura",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["id_cita", "total"],
+                "properties": {
+                  "id_cita": { "type": "integer", "example": 1 },
+                  "total": { "type": "number", "example": 20000.00 },
+                  "estado": { "type": "string", "example": "pendiente", "default": "pendiente" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Factura registrada correctamente" },
+          "401": { "description": "Token inválido o no enviado" }
+        }
+      }
+    },
+    "/facturas/cita/{id_cita}": {
+      "get": {
+        "tags": ["Facturas"],
+        "summary": "Obtener factura por ID de cita",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id_cita",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 1 }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Factura encontrada" },
+          "401": { "description": "Token inválido o no enviado" },
+          "404": { "description": "Factura no encontrada para esta cita" }
+        }
+      }
+    },
+    "/facturas/{id}/estado": {
+      "put": {
+        "tags": ["Facturas"],
+        "summary": "Actualizar estado de factura",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 1 }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["estado"],
+                "properties": {
+                  "estado": { "type": "string", "example": "pagado", "description": "Valores: pendiente, pagado, cancelado" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Estado actualizado correctamente" },
+          "401": { "description": "Token inválido o no enviado" },
+          "404": { "description": "Factura no encontrada" }
+        }
+      }
+    },
+    "/pagos/": {
+      "get": {
+        "tags": ["Pagos"],
+        "summary": "Listar pagos",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de pagos obtenida correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id_pago": { "type": "integer", "example": 1 },
+                      "id_factura": { "type": "integer", "example": 1 },
+                      "metodo": { "type": "string", "example": "Efectivo" },
+                      "fecha": { "type": "string", "example": "2026-04-02" },
+                      "monto": { "type": "number", "example": 20000.00 }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Token inválido o no enviado" }
+        }
+      },
+      "post": {
+        "tags": ["Pagos"],
+        "summary": "Registrar un nuevo pago",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["id_factura", "metodo", "monto"],
+                "properties": {
+                  "id_factura": { "type": "integer", "example": 1 },
+                  "metodo": { "type": "string", "example": "Efectivo" },
+                  "monto": { "type": "number", "example": 20000.00 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Pago registrado correctamente" },
+          "401": { "description": "Token inválido o no enviado" }
+        }
+      }
+    },
+    "/pagos/factura/{id_factura}": {
+      "get": {
+        "tags": ["Pagos"],
+        "summary": "Obtener pagos por factura",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id_factura",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 1 }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Lista de pagos de la factura" },
+          "401": { "description": "Token inválido o no enviado" }
+        }
+      }
+    },
+    "/productos/": {
+      "get": {
+        "tags": ["Productos"],
+        "summary": "Listar productos (paginado)",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 10 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista paginada de productos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id_producto": { "type": "integer", "example": 1 },
+                          "nombre": { "type": "string", "example": "Shampoo" },
+                          "precio": { "type": "number", "example": 10000.00 },
+                          "stock": { "type": "integer", "example": 50 },
+                          "estado": { "type": "string", "example": "activo" }
+                        }
+                      }
+                    },
+                    "total": { "type": "integer", "example": 2 },
+                    "page": { "type": "integer", "example": 1 },
+                    "per_page": { "type": "integer", "example": 10 },
+                    "total_pages": { "type": "integer", "example": 1 }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Token inválido o no enviado" }
+        }
+      },
+      "post": {
+        "tags": ["Productos"],
+        "summary": "Registrar un nuevo producto",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["nombre", "precio", "stock", "estado"],
+                "properties": {
+                  "nombre": { "type": "string", "example": "Esmalte" },
+                  "precio": { "type": "number", "example": 5000.00 },
+                  "stock": { "type": "integer", "example": 100 },
+                  "estado": { "type": "string", "example": "activo" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Producto registrado correctamente" },
+          "401": { "description": "Token inválido o no enviado" }
+        }
+      }
+    },
+    "/productos/{id}": {
+      "get": {
+        "tags": ["Productos"],
+        "summary": "Obtener un producto por ID",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 1 }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Producto encontrado" },
+          "401": { "description": "Token inválido o no enviado" },
+          "404": { "description": "Producto no encontrado" }
+        }
+      }
+    },
+    "/proveedores/": {
+      "get": {
+        "tags": ["Proveedores"],
+        "summary": "Listar proveedores (paginado)",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 10 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista paginada de proveedores",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "prv_id": { "type": "integer", "example": 1 },
+                          "prv_nombre": { "type": "string", "example": "Distribuidora Bella" },
+                          "prv_telefono": { "type": "string", "example": "3005556666" },
+                          "prv_email": { "type": "string", "example": "ventas@bellacosmetics.com" },
+                          "prv_direccion": { "type": "string", "example": "Calle 50 #20-30" }
+                        }
+                      }
+                    },
+                    "total": { "type": "integer", "example": 1 },
+                    "page": { "type": "integer", "example": 1 },
+                    "per_page": { "type": "integer", "example": 10 },
+                    "total_pages": { "type": "integer", "example": 1 }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Token inválido o no enviado" }
+        }
+      },
+      "post": {
+        "tags": ["Proveedores"],
+        "summary": "Registrar un nuevo proveedor",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["nombre"],
+                "properties": {
+                  "nombre": { "type": "string", "example": "Cosmeticos SAS" },
+                  "telefono": { "type": "string", "example": "3007778888" },
+                  "email": { "type": "string", "example": "contacto@cosmeticos.com" },
+                  "direccion": { "type": "string", "example": "Calle 100 #15-40" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Proveedor registrado correctamente" },
+          "401": { "description": "Token inválido o no enviado" }
+        }
+      }
+    },
+    "/proveedores/{id}": {
+      "get": {
+        "tags": ["Proveedores"],
+        "summary": "Obtener un proveedor por ID",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 1 }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Proveedor encontrado" },
+          "401": { "description": "Token inválido o no enviado" },
+          "404": { "description": "Proveedor no encontrado" }
+        }
+      },
+      "put": {
+        "tags": ["Proveedores"],
+        "summary": "Actualizar un proveedor",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 1 }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nombre": { "type": "string", "example": "Distribuidora Bella Plus" },
+                  "telefono": { "type": "string", "example": "3005556677" },
+                  "email": { "type": "string", "example": "ventas@bellacosmetics.com" },
+                  "direccion": { "type": "string", "example": "Calle 50 #20-35" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Proveedor actualizado correctamente" },
+          "401": { "description": "Token inválido o no enviado" },
+          "404": { "description": "Proveedor no encontrado" }
+        }
+      },
+      "delete": {
+        "tags": ["Proveedores"],
+        "summary": "Eliminar un proveedor",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 1 }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Proveedor eliminado correctamente" },
+          "401": { "description": "Token inválido o no enviado" },
+          "404": { "description": "Proveedor no encontrado" }
+        }
+      }
+    },
+    "/horarios/": {
+      "get": {
+        "tags": ["Horarios"],
+        "summary": "Listar horarios",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de horarios obtenida correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id_horario": { "type": "integer", "example": 1 },
+                      "id_empleado": { "type": "integer", "example": 3 },
+                      "dia_semana": { "type": "string", "example": "Lunes" },
+                      "hora_inicio": { "type": "string", "example": "09:00:00" },
+                      "hora_fin": { "type": "string", "example": "17:00:00" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Token inválido o no enviado" }
+        }
+      },
+      "post": {
+        "tags": ["Horarios"],
+        "summary": "Registrar un nuevo horario",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["id_empleado", "dia_semana", "hora_inicio", "hora_fin"],
+                "properties": {
+                  "id_empleado": { "type": "integer", "example": 3 },
+                  "dia_semana": { "type": "string", "example": "Martes" },
+                  "hora_inicio": { "type": "string", "example": "09:00:00" },
+                  "hora_fin": { "type": "string", "example": "18:00:00" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Horario registrado correctamente" },
+          "401": { "description": "Token inválido o no enviado" }
+        }
+      }
+    },
+    "/horarios/empleado/{id_empleado}": {
+      "get": {
+        "tags": ["Horarios"],
+        "summary": "Obtener horarios por empleado",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id_empleado",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 3 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de horarios del empleado"
+          },
+          "401": { "description": "Token inválido o no enviado" }
+        }
+      }
+    }
+  }
+}

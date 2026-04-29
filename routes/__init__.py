@@ -13,6 +13,7 @@ from .productos import producto_bp
 from .servicios_productos import servicio_producto_bp
 from .proveedores_productos import proveedor_producto_bp
 from .inventarios_movimientos import inventario_movimiento_bp
+from .documentacion import documentacion_bp
 
 def cargarRutas(app):
     app.register_blueprint(cliente_bp, url_prefix='/clientes')
@@ -30,3 +31,4 @@ def cargarRutas(app):
     app.register_blueprint(servicio_producto_bp, url_prefix='/servicios_productos')
     app.register_blueprint(proveedor_producto_bp, url_prefix='/proveedores_productos')
     app.register_blueprint(inventario_movimiento_bp, url_prefix='/inventario_movimientos')
+    app.register_blueprint(documentacion_bp, url_prefix='/documentacion')

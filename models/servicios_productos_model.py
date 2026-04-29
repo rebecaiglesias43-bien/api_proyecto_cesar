@@ -15,17 +15,36 @@ class ServicioProductoModel:
             'cantidad': self.cantidad
         }
 
-    @staticmethod
-    def listar_todos():
-        cursor = current_app.mysql.connection.cursor()
-        cursor.execute("SELECT sep_id, sep_servicio_id, sep_producto_id, sep_cantidad FROM servicios_productos")
-        datos = cursor.fetchall()
-        cursor.close()
-        resultado = []
-        for d in datos:
-            resultado.append(ServicioProductoModel(d[0], d[1], d[2], d[3]).to_dict())
-        return resultado
-
+@staticmethod
+def listar_todos(mysql, page=1, per_page=10):
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT COUNT(*) FROM servicios_productos")
+    total = cursor.fetchone()[0]
+    
+    offset = (page - 1) * per_page
+    cursor.execute("""
+        SELECT sep_id, sep_servicio_id, sep_producto_id, sep_cantidad 
+        FROM servicios_productos 
+        ORDER BY sep_id 
+        LIMIT %s OFFSET %s
+    """, (per_page, offset))
+    
+    datos = cursor.fetchall()
+    cursor.close()
+    
+    resultado = []
+    for d in datos:
+        resultado.append(ServicioProductoModel(d[0], d[1], d[2], d[3]).to_dict())
+    
+    total_pages = (total + per_page - 1) // per_page if total else 0
+    
+    return {
+        'data': resultado,
+        'total': total,
+        'page': page,
+        'per_page': per_page,
+        'total_pages': total_pages
+    }
     @staticmethod
     def obtener_por_id(id_relacion):
         cursor = current_app.mysql.connection.cursor()

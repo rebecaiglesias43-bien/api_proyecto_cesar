@@ -1,9 +1,19 @@
 from flask import request, jsonify, current_app
+from flask_jwt_extended import jwt_required
 from services.servicios_productos_services import ServicioProductoService
 
 def cntlistado_servicios_productos():
+    try:
+        page = int(request.args.get('page', 1))
+        per_page = int(request.args.get('per_page', 10))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Los parámetros "page" y "per_page" deben ser números enteros'}), 400
+    
+    if page <= 0 or per_page <= 0:
+        return jsonify({'error': 'Los parámetros "page" y "per_page" deben ser mayores que cero'}), 400
+    
     service = ServicioProductoService(current_app.mysql)
-    return jsonify(service.listar_todos())
+    return jsonify(service.listar_todos(page, per_page))
 
 def cntcrear_servicio_producto():
     data = request.get_json()
