@@ -1,10 +1,10 @@
+# app.py
 import os
 
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_mysqldb import MySQL
-
 from config import Config
 from routes import cargarRutas
 
@@ -17,6 +17,6 @@ JWTManager(app)
 
 mysql = MySQL(app)
 app.mysql = mysql
-
 cargarRutas(app)
+
 app.run(debug=True, port=4000, host='0.0.0.0')
