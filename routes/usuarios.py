@@ -1,6 +1,6 @@
 from flask import Blueprint
 from controllers.usuarios_controllers import (
-    cntlistado_usuarios, cntobtener_usuario, cntcrear_usuario
+    cntcrear_usuario, cntlistado_usuarios, cntlogin_usuario, cntobtener_usuario
 )
 
 usuario_bp = Blueprint('usuarios', __name__)
@@ -16,3 +16,7 @@ def obtener(id_usuario):
 @usuario_bp.route('/', methods=['POST'])
 def crear():
     return cntcrear_usuario()
+
+@usuario_bp.route('/login', methods=['POST'])
+def login():
+    return cntlogin_usuario()
